@@ -1,40 +1,28 @@
-# Hnefatafl Game
+# Hnefatafl — Java Terminal Game
 
-This project implements the classic board game Hnefatafl (often referred to as "The King's Table"). The game is known for its asymmetric gameplay, where one player defends the King, and the other tries to capture him.
+A terminal implementation of the asymmetric board game Hnefatafl, with separate board, piece, game-state, and interface components.
 
-## Project Structure
+## Run locally
 
-### Main Components
+Use a modern JDK (17 or later; the source uses records). From a POSIX shell:
 
-- **`App.java`**: The main entry point of the application.
-- **`TUI.java`**: Implements a text-based user interface for interacting with the game.
-- **`Args.java`**: Handles command-line arguments for the application.
+```bash
+git clone https://github.com/FuaadBashi/Hnefatafl-TUI.git
+cd Hnefatafl-TUI
+mkdir -p out
+find hnefatafl -name '*.java' > sources.txt
+javac -d out @sources.txt
+java -cp out ws.aperture.hnefatafl.App
+```
 
-### Packages and Classes
+The start screen collects attacker and defender names and a debug-mode choice.
 
-#### `utilities`
-- **`Pair.java`**: A utility class for managing pairs of related objects.
-- **`ANSIColour.java`**: Provides utilities for ANSI color codes to enhance terminal output.
+## Code to explore
 
-#### `model`
-- **`Board.java`**: Represents the game board and its state.
-- **`Game.java`**: Manages the core game logic.
-- **`King.java`**: Defines the King's behavior and properties.
-- **`Pawn.java`**: Defines the Pawn's behavior and properties.
-- **`Piece.java`**: A superclass for all game pieces.
-- **`Square.java`**: Represents individual squares on the board.
-- **`Player.java`**: Manages player-related logic.
-- **`MoveDTO.java`**: Data Transfer Object for encapsulating move data.
-- **`GameDTO.java`**: Data Transfer Object for sharing game state information.
-- **`DestResultDTO.java`**: Data Transfer Object for destination-related results.
+- [App.java](hnefatafl/App.java): connects the terminal interface to the game.
+- [Board.java](hnefatafl/model/Board.java): board state and move handling.
+- [Game.java](hnefatafl/model/Game.java): game coordination.
+- [TUI.java](hnefatafl/TUI.java): terminal interaction.
+- [GameDTO.java](hnefatafl/model/GameDTO.java): the state passed to the interface.
 
-#### `model.enums`
-- **`Side.java`**: Enumerates the sides (e.g., Attackers and Defenders).
-- **`Direction.java`**: Enumerates possible movement directions.
-
-## How to Run
-
-1. Ensure you have **Java 8+** installed.
-2. Compile the project using a Java compiler:
-   ```bash
-   javac -d out $(find ./hnefatafl -name "*.java")
+The source folders differ from the Java package names, so compile with `-d out` and use the fully qualified main class above.
