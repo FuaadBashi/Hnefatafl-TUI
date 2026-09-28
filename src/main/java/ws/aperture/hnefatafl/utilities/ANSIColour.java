@@ -28,8 +28,16 @@ public class ANSIColour {
     }
 
     public static void runBackGroundExample() {
-        System.out.println(ANSI_GREEN_BACKGROUND + "This text has a green background but default text!" + ANSI_RESET);
-        System.out.println(ANSI_RED + "This text has red text but a default background!" + ANSI_RESET);
-        System.out.println(ANSI_GREEN_BACKGROUND + ANSI_RED + "This text has a green background and red text!" + ANSI_RESET);
+        System.out.println(
+                ANSI_GREEN_BACKGROUND
+                        + "This text has a green background but default text!"
+                        + ANSI_RESET);
+        System.out.println(
+                ANSI_RED + "This text has red text but a default background!" + ANSI_RESET);
+        System.out.println(
+                ANSI_GREEN_BACKGROUND
+                        + ANSI_RED
+                        + "This text has a green background and red text!"
+                        + ANSI_RESET);
     }
 }

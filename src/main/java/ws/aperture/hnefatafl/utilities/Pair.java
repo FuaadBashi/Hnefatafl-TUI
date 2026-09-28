@@ -1,6 +1,6 @@
-package ws.aperture.hnefatafl.utilities; 
+package ws.aperture.hnefatafl.utilities;
 
-public class Pair <K, V> {
+public class Pair<K, V> {
     private K first;
     private V second;
 

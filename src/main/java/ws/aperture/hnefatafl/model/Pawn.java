@@ -3,23 +3,18 @@ package ws.aperture.hnefatafl.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import ws.aperture.hnefatafl.model.Board;
-import ws.aperture.hnefatafl.model.Square;
 import ws.aperture.hnefatafl.model.enums.Direction;
 import ws.aperture.hnefatafl.model.enums.Side;
 
-public class King extends Piece {
+public final class Pawn extends Piece {
 
-    final int[][] deltas = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } }; // N, E, S, W
-
-    public King(Board board, Square square) {
-        super(Side.DEFENDING, board, square);
+    public Pawn(Side side, Board board, Square square) {
+        super(side, board, square);
     }
 
     @Override
     public String toString() {
-        return super.toString() + "\u2655";
+        return super.toString() + "\u265F";
     }
 
     @Override
@@ -36,12 +31,12 @@ public class King extends Piece {
             int steps = 1;
             int[] d = Direction.getDelta(direction);
 
-            for (;;) {
+            for (; ; ) {
 
                 newRow = currentRow + (steps * d[0]);
                 newCol = currentCol + (steps * d[1]);
 
-                if (!Board.onBoard(newRow, newCol)) {
+                if (!Board.onBoard(newRow, newCol) || Board.isCornerSquare(newRow, newCol)) {
                     break;
                 }
 
@@ -50,42 +45,26 @@ public class King extends Piece {
                 if (Board.isThroneSquare(prospective)) {
 
                     if (prospective.isEmpty()) {
-                        List<Square> attacks = new ArrayList<Square>();
-                        attacks.addAll(calcAttacks(prospective, Direction.opposite(direction)));
-                        movesAttacks.put(prospective, attacks);
                         ++steps;
-
                     } else {
                         break;
                     }
 
                 } else if (prospective.isEmpty()) {
 
-                    List<Square> attacks = new ArrayList<Square>();
-                    attacks.addAll(calcAttacks(prospective, Direction.opposite(direction)));
-
+                    List<Square> attacks = calcAttacks(prospective, Direction.opposite(direction));
                     movesAttacks.put(prospective, attacks);
                     ++steps;
                 } else {
                     break;
                 }
-
             }
         }
 
         return !movesAttacks.isEmpty();
     }
 
-    /**
-     *  @param prospective      The prospective Square to which we are considering moving.
-     *  @param fromDirection    The direction which we moved from to reach prospective.
-     * 
-     *      Out of the 4 squares that are adjacent to the square which we are moving to (prospective),
-     *      we want to check each for an enemy, then determine if a friendly soldier is one step further.
-     * 
-     *      One of the adjacent sqaures will be the direction we came from to reach this square, this is
-     *      the fromDirection, which we can skip over when checking each possible adjacent square.
-     */
+    @Override
     protected List<Square> calcAttacks(Square prospective, Direction fromDirection) {
         List<Square> attacks = new ArrayList<Square>();
         int newRow, newCol;
@@ -126,11 +105,11 @@ public class King extends Piece {
                 }
 
                 twoStep = board.getSquare(newRow, newCol);
-                if ( Board.isCornerSquare(twoStep) || Board.isThroneSquare(twoStep) ) {
-                    attacks.add( oneStep );
+
+                if (Board.isCornerSquare(twoStep) || Board.isThroneSquare(twoStep)) {
+                    attacks.add(oneStep);
                     continue;
                 }
-                
 
                 if (twoStep.isEmpty()) {
                     continue;
@@ -140,25 +119,33 @@ public class King extends Piece {
 
                 if (twoStepOccupier.sameSide(side)) {
                     // SANDWICH ACHIEVED
-                    attacks.add(oneStep);
+
+                    if (oneStepOccupier instanceof King) {
+                        if (board.kingEncircledOnAllDirectionsBut(Direction.opposite(d))) {
+                            attacks.add(oneStep);
+                        }
+                    } else {
+                        attacks.add(oneStep);
+                    }
+
                 } else {
                     // SHIELD WALL CHECK
 
-
-                    int sheildWallwVitims = board.isShieldWall(oneStep, d);
+                    int shieldWallVictims = board.isShieldWall(oneStep, d);
 
                     Square victimSquare = oneStep;
-                    if( sheildWallwVitims != 0 ) {
-                        for(int i = 0; i<sheildWallwVitims; ++i) {
-                            attacks.add(victimSquare);
+                    if (shieldWallVictims != 0) {
+                        for (int i = 0; i < shieldWallVictims; ++i) {
+                            if (victimSquare != board.getKingSquare()) {
+                                attacks.add(victimSquare);
+                            }
+
                             victimSquare = board.getNeighbour(victimSquare, d);
                         }
                     }
-                
                 }
             }
         }
         return attacks;
     }
-
 }

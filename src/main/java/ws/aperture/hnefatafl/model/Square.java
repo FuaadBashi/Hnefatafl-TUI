@@ -1,8 +1,5 @@
 package ws.aperture.hnefatafl.model;
 
-
-import ws.aperture.hnefatafl.model.Piece;
-
 public class Square {
 
     private int row;
@@ -62,12 +59,6 @@ public class Square {
     }
 
     public static boolean areAdjacent(Square sq1, Square sq2) {
-        return  1 == (Math.abs(sq1.getRow() - sq2.getRow())
-            + Math.abs(sq1.getCol() - sq2.getCol()));
+        return 1 == (Math.abs(sq1.getRow() - sq2.getRow()) + Math.abs(sq1.getCol() - sq2.getCol()));
     }
-
-    
-
-
-
 }
