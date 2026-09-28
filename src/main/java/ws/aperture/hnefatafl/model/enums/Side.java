@@ -5,7 +5,7 @@ public enum Side {
     DEFENDING;
 
     public static Side otherSide(Side side) {
-        return ( side == ATTACKING ) ? DEFENDING : ATTACKING;
+        return (side == ATTACKING) ? DEFENDING : ATTACKING;
     }
 
     @Override

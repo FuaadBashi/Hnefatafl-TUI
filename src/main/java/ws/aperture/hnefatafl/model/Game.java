@@ -1,38 +1,35 @@
 package ws.aperture.hnefatafl.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import ws.aperture.hnefatafl.model.enums.Side;
-import ws.aperture.hnefatafl.model.Piece;
 
 public class Game {
 
-
-    private Side              turn;
-    private Board             board;
-    private int               moveCounter;
+    private Side turn;
+    private Board board;
+    private int moveCounter;
     private Map<Side, Player> players;
-    private Player            winner;
-    private boolean           gameOver;
+    private Player winner;
+    private boolean gameOver;
 
+    public Game(String attackerName, String defenderName, boolean debugMode) {
+        this(attackerName, defenderName, debugMode ? Board.kingMakesSWAttack() : new Board());
+    }
 
-
-
-    public Game(String attackerName, String defenderName, boolean debugMode){
+    /** Starts from a prepared position; used by tests to set up specific rule scenarios. */
+    Game(String attackerName, String defenderName, Board board) {
 
         turn = Side.ATTACKING;
-        board = (debugMode) ? Board.kingMakesSWAttack() : new Board() ;
+        this.board = board;
         moveCounter = 0;
         gameOver = false;
         winner = null;
 
         players = new HashMap<Side, Player>();
-        players.put(Side.ATTACKING,  new Player(attackerName ));
+        players.put(Side.ATTACKING, new Player(attackerName));
         players.put(Side.DEFENDING, new Player(defenderName));
-
     }
 
     boolean gameOver() {
@@ -47,39 +44,39 @@ public class Game {
         return (moveCounter / 2) + 1;
     }
 
-    List<Square> getMoves( Piece piece ) {
+    List<Square> getMoves(Piece piece) {
         return piece.getMoves();
         // return board.getMovesAndAttacks( piece ).getFirst();
     }
 
-    List<Square> getAttacks( Piece piece ) {
-        
+    List<Square> getAttacks(Piece piece) {
+
         return piece.getAttacks();
         // return board.getMovesAndAttacks( piece ).getSecond();
     }
 
-    Square getSquare( int row, int col ) {
-        return board.getSquare( row, col );
+    Square getSquare(int row, int col) {
+        return board.getSquare(row, col);
     }
 
     /*  Assumes square code has already been validated by the TUI,
-        no NULL checking on purpose, if we get a NULL here we
-        want to see it.  */ 
-    Square getSquare( String squareCode ) {
+    no NULL checking on purpose, if we get a NULL here we
+    want to see it.  */
+    Square getSquare(String squareCode) {
         return board.getSquare(squareCode);
     }
 
     public GameDTO move(String sourceloc, String destLoc) {
 
-        if ( !gameOver() ) {
+        if (!gameOver()) {
 
             Piece piece = board.getSquare(sourceloc).getPiece();
             Square destSquare = board.getSquare(destLoc);
 
-            board.move( piece, destSquare );
+            board.move(piece, destSquare);
             endTurn();
         }
-        
+
         return GameDTO.generateDTO(this);
     }
 
@@ -111,19 +108,16 @@ public class Game {
         return board.getAttackers();
     }
 
-
     private void endTurn() {
-        
+
         if (checkEndGame()) {
             return;
         }
 
-        boolean movesAvailable = board.calcMovesAttacks( Side.otherSide(turn) ); 
-
-
+        boolean movesAvailable = board.calcMovesAttacks(Side.otherSide(turn));
 
         if (!movesAvailable) {
-            winner = players.get( turn );
+            winner = players.get(turn);
             gameOver = true;
             return;
         }
@@ -132,20 +126,20 @@ public class Game {
         moveCounter++;
     }
 
-
-/** TODO:
- *      Need to add encirclement check here
- * @return
- */
+    /**
+     * TODO: Need to add encirclement check here
+     *
+     * @return
+     */
     private boolean checkEndGame() {
-        if ( getNumPieces(Side.ATTACKING) == 0 || board.kingEscaped()  || board.checkExitFort() ) {
-            winner = players.get( Side.DEFENDING );
+        if (getNumPieces(Side.ATTACKING) == 0 || board.kingEscaped() || board.checkExitFort()) {
+            winner = players.get(Side.DEFENDING);
             gameOver = true;
             return true;
         }
 
-        if ( board.kingCaptured() || board.kingAloneAgainstWall() || board.noRouteToExit()) {
-            winner = players.get( Side.ATTACKING );
+        if (board.kingCaptured() || board.kingAloneAgainstWall() || board.noRouteToExit()) {
+            winner = players.get(Side.ATTACKING);
             gameOver = true;
             return true;
         }
@@ -154,12 +148,13 @@ public class Game {
     }
 
     void switchPlayerTurn() {
-        turn = Side.otherSide( turn );
+        turn = Side.otherSide(turn);
     }
-    
-    Side getSide(Piece piece){
+
+    Side getSide(Piece piece) {
         return piece.getSide();
     }
+
     public static int getNumRowsCols() {
         return Board.NUM_ROW_COL;
     }
@@ -167,5 +162,4 @@ public class Game {
     Side getPlayerTurn() {
         return turn;
     }
-
 }
